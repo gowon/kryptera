@@ -27,6 +27,9 @@
             AddOption(new Option<FileSystemInfo>(new[] {"-o", "/o", "--output"},
                 "Specify output file or directory"));
             
+            AddOption(new Option<bool>(new[] {"-t", "/t", "--base64"},
+                "Encrypt as base64 encoded text"));
+
             AddOption(new Option<bool>(new[] {"-f", "/f", "--force"},
                 "Overwrite existing files"));
 
