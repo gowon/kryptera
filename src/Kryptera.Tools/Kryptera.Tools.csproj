@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyTitle>Kryptera.Tools</AssemblyTitle>
+    <Version>1.0.0</Version>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>dotnet-kryptera</AssemblyName>
+    <OutputType>Exe</OutputType>
+    <PackageId>Kryptera.Tools</PackageId>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>dotnet-kryptera</ToolCommandName>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+  </PropertyGroup>
+
+  <PropertyGroup Label="NuspecProperties">
+    <Authors>Gowon Patterson</Authors>
+    <Description>Kryptera is a quick-and-dirty .NET Core Tool to encrypt and decrypt files using AEAD AES-256-GCM, as well as an encryption key generator.</Description>
+    <Copyright>© Gowon Patterson. All rights reserved.</Copyright>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/gowon/kryptera</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTags>dotnet encrypt decrypt generator</PackageTags>
+    <PackageProjectUrl>https://github.com/gowon/kryptera</PackageProjectUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CryptHash.Net" Version="3.6.1" />
+    <PackageReference Include="MediatR" Version="9.0.0" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
+    <PackageReference Include="Pastel" Version="2.1.0" />
+    <PackageReference Include="Serilog" Version="2.10.0" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="3.0.1" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+    <PackageReference Include="Serilog.Sinks.Debug" Version="2.0.0" />
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.21216.1" />
+    <PackageReference Include="System.CommandLine.Hosting" Version="0.3.0-alpha.21216.1" />
+  </ItemGroup>
+
+</Project>
