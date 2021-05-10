@@ -2,6 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.CommandLine;
+    using System.CommandLine.IO;
     using System.Diagnostics;
     using System.Drawing;
     using System.IO;
@@ -15,11 +17,13 @@
 
     public class EncryptFilesHandler : AsyncRequestHandler<EncryptFiles>
     {
+        private readonly IConsole _console;
         private readonly ILogger<EncryptFilesHandler> _logger;
 
-        public EncryptFilesHandler(ILogger<EncryptFilesHandler> logger)
+        public EncryptFilesHandler(IConsole console, ILogger<EncryptFilesHandler> logger)
         {
-            _logger = logger;
+            _console = console ?? throw new NullReferenceException(nameof(console));
+            _logger = logger ?? throw new NullReferenceException(nameof(logger));
         }
 
         protected override async Task Handle(EncryptFiles request, CancellationToken cancellationToken)
@@ -114,12 +118,13 @@
                         ? encrypted.EncryptedDataBase64String.Length
                         : encrypted.EncryptedDataBytes.Length;
 
-                    Console.WriteLine(
+                    _console.Out.WriteLine(
                         $"Wrote {length.ToString().Pastel(Color.DeepSkyBlue)} bytes to {target.FullName.Pastel(Color.DimGray)}.");
                 }
                 else
                 {
-                    _logger.LogWarning($"File {target.FullName.Pastel(Color.DimGray)} already exists. To overwrite, please set the --force option.");
+                    _logger.LogWarning(
+                        $"File {target.FullName.Pastel(Color.DimGray)} already exists. To overwrite, please set the --force option.");
                 }
             }
 

@@ -3,12 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31005.135
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kryptera.Tools", "src\Kryptera.Tools\Kryptera.Tools.csproj", "{7A3A3CE9-0F53-4CA7-BBD9-FFE63ECB3A64}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kryptera.Tools", "src\Kryptera.Tools\Kryptera.Tools.csproj", "{7A3A3CE9-0F53-4CA7-BBD9-FFE63ECB3A64}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{730BE3AF-871D-4F7B-A5DB-B46D01A5BBA9}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kryptera.Tools.Tests", "tests\Kryptera.Tools.Tests\Kryptera.Tools.Tests.csproj", "{7B216500-A738-43CB-8A0F-94BBF04E104C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,6 +22,10 @@ Global
 		{7A3A3CE9-0F53-4CA7-BBD9-FFE63ECB3A64}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7A3A3CE9-0F53-4CA7-BBD9-FFE63ECB3A64}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7A3A3CE9-0F53-4CA7-BBD9-FFE63ECB3A64}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B216500-A738-43CB-8A0F-94BBF04E104C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B216500-A738-43CB-8A0F-94BBF04E104C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B216500-A738-43CB-8A0F-94BBF04E104C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B216500-A738-43CB-8A0F-94BBF04E104C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

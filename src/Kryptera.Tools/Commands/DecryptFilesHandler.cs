@@ -2,6 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.CommandLine;
+    using System.CommandLine.IO;
     using System.Diagnostics;
     using System.Drawing;
     using System.IO;
@@ -15,11 +17,13 @@
 
     public class DecryptFilesHandler : AsyncRequestHandler<DecryptFiles>
     {
+        private readonly IConsole _console;
         private readonly ILogger<DecryptFilesHandler> _logger;
 
-        public DecryptFilesHandler(ILogger<DecryptFilesHandler> logger)
+        public DecryptFilesHandler(IConsole console, ILogger<DecryptFilesHandler> logger)
         {
-            _logger = logger;
+            _console = console ?? throw new NullReferenceException(nameof(console));
+            _logger = logger ?? throw new NullReferenceException(nameof(logger));
         }
 
         protected override async Task Handle(DecryptFiles request, CancellationToken cancellationToken)
@@ -112,7 +116,7 @@
                 if (!target.Exists || request.ForceOverwrite)
                 {
                     await File.WriteAllBytesAsync(target.FullName, decrypted.DecryptedDataBytes, cancellationToken);
-                    Console.WriteLine(
+                    _console.Out.WriteLine(
                         $"Wrote {decrypted.DecryptedDataBytes.Length.ToString().Pastel(Color.DeepSkyBlue)} bytes to {target.FullName.Pastel(Color.DimGray)}.");
                 }
                 else
