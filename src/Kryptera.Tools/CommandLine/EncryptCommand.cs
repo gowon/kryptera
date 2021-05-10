@@ -17,8 +17,10 @@
         {
             // arguments
             AddArgument(new Argument<FileSystemInfo>("source",
-                    "Specify the source file or directory")
-                {Arity = ArgumentArity.ExactlyOne});
+                "Specify the source file or directory")
+            {
+                Arity = ArgumentArity.ExactlyOne
+            });
 
             // options
             AddOption(new Option<string>(new[] {"-k", "/k", "--key"},
@@ -26,16 +28,13 @@
 
             AddOption(new Option<FileSystemInfo>(new[] {"-o", "/o", "--output"},
                 "Specify output file or directory"));
-            
+
             AddOption(new Option<bool>(new[] {"-t", "/t", "--base64"},
                 "Encrypt as base64 encoded text"));
 
             AddOption(new Option<bool>(new[] {"-f", "/f", "--force"},
                 "Overwrite existing files"));
 
-            AddOption(new Option<bool>(new[] {"-c", "/c", "--console-only"},
-                "Output the results to the console only"));
-            
             // handler
             Handler = CommandHandlerFactory.CreateFor<EncryptFiles>();
         }

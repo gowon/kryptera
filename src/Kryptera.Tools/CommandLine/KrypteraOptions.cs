@@ -5,5 +5,6 @@
     public class KrypteraOptions
     {
         public LogLevel Verbosity { get; set; } = LogLevel.Warning;
+        public string EncryptionKey { get; set; }
     }
 }
