@@ -11,6 +11,7 @@
     using System.Threading;
     using System.Threading.Tasks;
     using CryptHash.Net.Encryption.AES.AEAD;
+    using Extensions;
     using MediatR;
     using Microsoft.Extensions.Logging;
     using Pastel;
@@ -132,11 +133,10 @@
 
         private static string GenerateDecryptedFilename(FileSystemInfo fileInfo)
         {
-            const string suffix = ".aes";
             var targetFilename = fileInfo.Name;
-            targetFilename = targetFilename.EndsWith(suffix)
-                ? targetFilename.Remove(targetFilename.Length - suffix.Length)
-                : $"{Path.GetFileNameWithoutExtension(fileInfo.Name)}-decrypted{Path.GetExtension(fileInfo.Name)}";
+            targetFilename = targetFilename.EndsWith(Constants.EncryptedFileExtension)
+                ? targetFilename.Remove(targetFilename.Length - Constants.EncryptedFileExtension.Length)
+                : $"{Path.GetFileNameWithoutExtension(fileInfo.Name)}{Constants.DecryptedFileSuffix}{Path.GetExtension(fileInfo.Name)}";
 
             return targetFilename;
         }

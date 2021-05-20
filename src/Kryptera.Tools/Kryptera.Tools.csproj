@@ -4,8 +4,8 @@
     <AssemblyTitle>Kryptera.Tools</AssemblyTitle>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <LangVersion>latest</LangVersion>
-    <AssemblyName>dotnet-kryptera</AssemblyName>
-    <ToolCommandName>dotnet-kryptera</ToolCommandName>
+    <AssemblyName>kryptera</AssemblyName>
+    <ToolCommandName>kryptera</ToolCommandName>
     <OutputType>Exe</OutputType>
     <PackageId>Kryptera.Tools</PackageId>
     <PackAsTool>true</PackAsTool>
