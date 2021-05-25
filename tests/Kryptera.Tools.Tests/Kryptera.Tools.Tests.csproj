@@ -24,7 +24,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Kryptera.Tools\Kryptera.Tools.csproj" />
-    <ProjectReference Include="..\..\src\Kryptera\Kryptera.csproj" />
   </ItemGroup>
 
   <ItemGroup>

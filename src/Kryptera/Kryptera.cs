@@ -1,4 +1,8 @@
-﻿namespace Kryptera
+﻿using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("Kryptera.Tools")]
+
+namespace Kryptera
 {
     using System;
     using System.IO;
@@ -9,7 +13,7 @@
 
     public static class Kryptera
     {
-        private static Lazy<AEAD_AES_256_GCM> AesAlgorithm => new Lazy<AEAD_AES_256_GCM>(() => new AEAD_AES_256_GCM());
+        private static Lazy<AEAD_AES_256_GCM> AesAlgorithm => new(() => new AEAD_AES_256_GCM());
 
         public static async Task<string> DecryptBase64FileAsync(string path, string password,
             CancellationToken cancellationToken = default)
@@ -20,7 +24,7 @@
         public static async Task<string> DecryptBase64FileAsync(FileInfo fileInfo, string password,
             CancellationToken cancellationToken = default)
         {
-            var result = await InternalDecryptAsync(fileInfo, password, true, cancellationToken);
+            var result = await InternalDecryptFileAsync(fileInfo, password, true, cancellationToken);
 
             // https://docs.microsoft.com/en-us/dotnet/api/system.text.utf8encoding.getstring?view=net-5.0#examples
             // https://stackoverflow.com/a/4900684/7644876
@@ -36,7 +40,7 @@
         public static async Task<byte[]> DecryptBase64FileBytesAsync(FileInfo fileInfo, string password,
             CancellationToken cancellationToken = default)
         {
-            var result = await InternalDecryptAsync(fileInfo, password, true, cancellationToken);
+            var result = await InternalDecryptFileAsync(fileInfo, password, true, cancellationToken);
             return result.Success ? result.DecryptedDataBytes : null;
         }
 
@@ -49,7 +53,7 @@
         public static async Task<string> DecryptBinaryFileAsync(FileInfo fileInfo, string password,
             CancellationToken cancellationToken = default)
         {
-            var result = await InternalDecryptAsync(fileInfo, password, false, cancellationToken);
+            var result = await InternalDecryptFileAsync(fileInfo, password, false, cancellationToken);
 
             // https://docs.microsoft.com/en-us/dotnet/api/system.text.utf8encoding.getstring?view=net-5.0#examples
             // https://stackoverflow.com/a/4900684/7644876
@@ -65,7 +69,7 @@
         public static async Task<byte[]> DecryptBinaryFileBytesAsync(FileInfo fileInfo, string password,
             CancellationToken cancellationToken = default)
         {
-            var result = await InternalDecryptAsync(fileInfo, password, false, cancellationToken);
+            var result = await InternalDecryptFileAsync(fileInfo, password, false, cancellationToken);
             return result.Success ? result.DecryptedDataBytes : null;
         }
 
@@ -78,7 +82,7 @@
         public static async Task<string> EncryptFileBase64StringAsync(FileInfo fileInfo, string password,
             CancellationToken cancellationToken = default)
         {
-            var result = await InternalEncryptAsync(fileInfo, password, cancellationToken);
+            var result = await InternalEncryptFileAsync(fileInfo, password, cancellationToken);
             return result.EncryptedDataBase64String;
         }
 
@@ -91,11 +95,11 @@
         public static async Task<byte[]> EncryptFileBytesAsync(FileInfo fileInfo, string password,
             CancellationToken cancellationToken = default)
         {
-            var result = await InternalEncryptAsync(fileInfo, password, cancellationToken);
+            var result = await InternalEncryptFileAsync(fileInfo, password, cancellationToken);
             return result.EncryptedDataBytes;
         }
 
-        internal static async Task<AesEncryptionResult> InternalEncryptAsync(FileSystemInfo info, string password,
+        internal static async Task<AesEncryptionResult> InternalEncryptFileAsync(FileSystemInfo info, string password,
             CancellationToken cancellationToken)
         {
             var key = Convert.FromBase64String(password);
@@ -103,7 +107,7 @@
             return AesAlgorithm.Value.EncryptString(bytes, key);
         }
 
-        internal static async Task<AesDecryptionResult> InternalDecryptAsync(FileSystemInfo info, string password,
+        internal static async Task<AesDecryptionResult> InternalDecryptFileAsync(FileSystemInfo info, string password,
             bool isBase64,
             CancellationToken cancellationToken)
         {

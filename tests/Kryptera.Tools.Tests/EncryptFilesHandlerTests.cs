@@ -42,7 +42,7 @@
                 EncryptToBase64 = true,
                 ForceOverwrite = true
             }, default);
-
+            
             Assert.NotNull(console.Out.ToString());
         }
 

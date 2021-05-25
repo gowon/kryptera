@@ -2,10 +2,11 @@
 {
     using System.CommandLine;
     using System.CommandLine.Invocation;
+    using Extensions;
 
     public class KrypteraRootCommand : RootCommand
     {
-        public static string AssemblyName => typeof(KrypteraRootCommand).Assembly.GetName().Name!.ToLowerInvariant();
+        public static string AssemblyName => Constants.ToolCommandName;
 
         public KrypteraRootCommand()
         {

@@ -3,10 +3,36 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <LangVersion>latest</LangVersion>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GitInfoReportImportance Condition="'$(Configuration)' == 'Release'">high</GitInfoReportImportance>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CryptHash.Net" Version="3.6.1" />
+    <Compile Include="..\GlobalAssemblyInfo.cs" Link="Properties\GlobalAssemblyInfo.cs" />
   </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CryptHash.Net" Version="3.6.1" />
+    <PackageReference Include="GitInfo" Version="2.1.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <Target Name="SetVersion" BeforeTargets="Build;GetPackageVersion;_IntrospectProjectProperties" DependsOnTargets="GitVersion">
+    <PropertyGroup>
+      <!-- Packages for feature branches are marked as "alpha" (ex., 2.1.0-alpha426e8bcf) -->
+      <GitSemVerDashLabel Condition="$(GitBranch.Contains('feature'))">alpha$(GitCommit)</GitSemVerDashLabel>
+
+      <!-- Packages for release branches are marked as "rc", release candidates (ex., 2.1.0-rc426e8bcf) -->
+      <GitSemVerDashLabel Condition="$(GitBranch.Contains('releases'))">rc$(GitCommit)</GitSemVerDashLabel>
+
+      <!-- Packages for the master branch have no suffix (ex., 2.1.0) -->
+      <GitSemVerDashLabel Condition="$(GitBranch.Contains('master'))"></GitSemVerDashLabel>
+
+      <PackageVersion Condition="'$(GitSemVerDashLabel)' != ''">$(GitSemVerMajor).$(GitSemVerMinor).$(GitSemVerPatch)-$(GitSemVerDashLabel)</PackageVersion>
+      <PackageVersion Condition="'$(GitSemVerDashLabel)' == ''">$(GitSemVerMajor).$(GitSemVerMinor).$(GitSemVerPatch)</PackageVersion>
+    </PropertyGroup>
+  </Target>
 
 </Project>
