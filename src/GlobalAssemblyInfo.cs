@@ -33,5 +33,5 @@ internal partial class ThisAssembly
     /// <summary>
     ///     Full version, plus branch and commit short sha, like 4.0.1.598-cycle6+39cf84e
     /// </summary>
-    public const string InformationalVersion = Version + "-" + Git.Branch + "+" + Git.Commit;
+    public const string InformationalVersion = Version + "+" + Git.Commit;
 }

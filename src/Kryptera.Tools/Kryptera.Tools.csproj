@@ -54,10 +54,10 @@
   <Target Name="SetVersion" BeforeTargets="Build;GetPackageVersion;_IntrospectProjectProperties" DependsOnTargets="GitVersion">
     <PropertyGroup>
       <!-- Packages for feature branches are marked as "alpha" (ex., 2.1.0-alpha426e8bcf) -->
-      <GitSemVerDashLabel Condition="$(GitBranch.Contains('feature'))">alpha$(GitCommit)</GitSemVerDashLabel>
+      <GitSemVerDashLabel Condition="$(GitBranch.Contains('feature'))">alpha+$(GitCommit)</GitSemVerDashLabel>
 
       <!-- Packages for release branches are marked as "rc", release candidates (ex., 2.1.0-rc426e8bcf) -->
-      <GitSemVerDashLabel Condition="$(GitBranch.Contains('releases'))">rc$(GitCommit)</GitSemVerDashLabel>
+      <GitSemVerDashLabel Condition="$(GitBranch.Contains('releases'))">rc+$(GitCommit)</GitSemVerDashLabel>
 
       <!-- Packages for the master branch have no suffix (ex., 2.1.0) -->
       <GitSemVerDashLabel Condition="$(GitBranch.Contains('master'))"></GitSemVerDashLabel>
