@@ -1,12 +1,25 @@
-﻿namespace Kryptera.Tools.Tests
+﻿namespace Kryptera.Tools.Tests.Helpers
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
 
     [ExcludeFromCodeCoverage]
-    public static class DirectoryInfoExtensions
+    internal static class Utilities
     {
+        public static bool IsBase64String(string value)
+        {
+            try
+            {
+                _ = Convert.FromBase64String(value);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public static void CopyAllFilesTo(this DirectoryInfo source, DirectoryInfo target)
         {
             Directory.CreateDirectory(target.FullName);

@@ -2,6 +2,7 @@
 {
     using System.CommandLine.Invocation;
     using System.CommandLine.Parsing;
+    using System.Threading;
     using Commands;
     using MediatR;
     using Microsoft.Extensions.DependencyInjection;
@@ -11,23 +12,14 @@
     {
         public static ICommandHandler CreateFor<TRequest>() where TRequest : ICommandLineRequest, new()
         {
-            return CommandHandler.Create(async (IHost host, ParseResult parseResult) =>
-            {
-                var mediator = host.Services.GetRequiredService<IMediator>();
-
-                var request = new TRequest();
-                request.Map(parseResult);
-
-                // ReSharper disable once SuspiciousTypeConversion.Global
-                if (request is IRequest<int> returnRequest)
+            return CommandHandler.Create(
+                async (IHost host, ParseResult parseResult, CancellationToken cancellationToken) =>
                 {
-                    return await mediator.Send(returnRequest);
-                }
-
-                request.Map(parseResult);
-                await mediator.Send(request);
-                return 0;
-            });
+                    var mediator = host.Services.GetRequiredService<IMediator>();
+                    var request = new TRequest();
+                    request.Map(parseResult);
+                    await mediator.Send(request, cancellationToken);
+                });
         }
     }
 }

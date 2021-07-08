@@ -8,12 +8,12 @@
     using System.Drawing;
     using System.IO;
     using System.Linq;
+    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
     using CryptHash.Net.Encryption.AES.AEAD;
     using Extensions;
     using MediatR;
-    using Microsoft.Extensions.FileProviders;
     using Microsoft.Extensions.Logging;
     using Pastel;
 
@@ -35,10 +35,12 @@
                 throw new ArgumentException("Key must not be empty", nameof(request.Key));
             }
 
-            var password = Convert.FromBase64String(request.Key);
+            // https://github.com/dotnet/standard/issues/260#issuecomment-290834776
+            // https://docs.microsoft.com/en-us/dotnet/api/system.text.utf8encoding?view=net-5.0#remarks
+            var password = new UTF8Encoding(false).GetBytes(request.Key);
             var aes = new AEAD_AES_256_GCM();
             var fileMap = new List<Tuple<FileInfo, FileInfo>>();
-            
+
             switch (request.Source)
             {
                 case DirectoryInfo sourceDirectory:
@@ -64,9 +66,11 @@
                     if (sourceDirectory.Exists)
                     {
                         fileMap.AddRange(sourceDirectory.GetFiles()
-                            .Where(info => !info.Extension.Equals(Constants.EncryptedFileExtension, StringComparison.OrdinalIgnoreCase))
+                            .Where(info => !info.Extension.Equals(Constants.EncryptedFileExtension,
+                                StringComparison.OrdinalIgnoreCase))
                             .Select(file => new Tuple<FileInfo, FileInfo>(file,
-                                new FileInfo(Path.Combine(targetDirectory.FullName, $"{file.Name}{Constants.EncryptedFileExtension}")))));
+                                new FileInfo(Path.Combine(targetDirectory.FullName,
+                                    $"{file.Name}{Constants.EncryptedFileExtension}")))));
                     }
 
                     break;
@@ -79,7 +83,8 @@
                             targetFile = new FileInfo($"{sourceFile.FullName}{Constants.EncryptedFileExtension}");
                             break;
                         case DirectoryInfo directoryInfo:
-                            targetFile = new FileInfo(Path.Combine(directoryInfo.FullName, $"{sourceFile.Name}{Constants.EncryptedFileExtension}"));
+                            targetFile = new FileInfo(Path.Combine(directoryInfo.FullName,
+                                $"{sourceFile.Name}{Constants.EncryptedFileExtension}"));
                             break;
                         case FileInfo fileInfo:
                             targetFile = fileInfo;

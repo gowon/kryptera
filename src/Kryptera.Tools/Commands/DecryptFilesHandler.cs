@@ -8,6 +8,7 @@
     using System.Drawing;
     using System.IO;
     using System.Linq;
+    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
     using CryptHash.Net.Encryption.AES.AEAD;
@@ -34,7 +35,9 @@
                 throw new ArgumentException("Key must not be empty", nameof(request.Key));
             }
 
-            var password = Convert.FromBase64String(request.Key);
+            // https://github.com/dotnet/standard/issues/260#issuecomment-290834776
+            // https://docs.microsoft.com/en-us/dotnet/api/system.text.utf8encoding?view=net-5.0#remarks
+            var password = new UTF8Encoding(false).GetBytes(request.Key);
             var aes = new AEAD_AES_256_GCM();
             var fileMap = new List<Tuple<FileInfo, FileInfo>>();
 
