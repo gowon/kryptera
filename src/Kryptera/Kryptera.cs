@@ -6,6 +6,7 @@ namespace Kryptera
 {
     using System;
     using System.IO;
+    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
     using CryptHash.Net.Encryption.AES.AEAD;
@@ -102,7 +103,9 @@ namespace Kryptera
         internal static async Task<AesEncryptionResult> InternalEncryptFileAsync(FileSystemInfo info, string password,
             CancellationToken cancellationToken)
         {
-            var key = Convert.FromBase64String(password);
+            // https://github.com/dotnet/standard/issues/260#issuecomment-290834776
+            // https://docs.microsoft.com/en-us/dotnet/api/system.text.utf8encoding?view=net-5.0#remarks
+            var key = new UTF8Encoding(false).GetBytes(password);
             var bytes = await File.ReadAllBytesAsync(info.FullName, cancellationToken);
             return AesAlgorithm.Value.EncryptString(bytes, key);
         }
@@ -111,7 +114,10 @@ namespace Kryptera
             bool isBase64,
             CancellationToken cancellationToken)
         {
-            var key = Convert.FromBase64String(password);
+
+            // https://github.com/dotnet/standard/issues/260#issuecomment-290834776
+            // https://docs.microsoft.com/en-us/dotnet/api/system.text.utf8encoding?view=net-5.0#remarks
+            var key = new UTF8Encoding(false).GetBytes(password);
             byte[] bytes;
 
             if (isBase64)

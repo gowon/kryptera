@@ -8,10 +8,8 @@
     using System.Drawing;
     using System.IO;
     using System.Linq;
-    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-    using CryptHash.Net.Encryption.AES.AEAD;
     using Extensions;
     using MediatR;
     using Microsoft.Extensions.Logging;
@@ -35,10 +33,6 @@
                 throw new ArgumentException("Key must not be empty", nameof(request.Key));
             }
 
-            // https://github.com/dotnet/standard/issues/260#issuecomment-290834776
-            // https://docs.microsoft.com/en-us/dotnet/api/system.text.utf8encoding?view=net-5.0#remarks
-            var password = new UTF8Encoding(false).GetBytes(request.Key);
-            var aes = new AEAD_AES_256_GCM();
             var fileMap = new List<Tuple<FileInfo, FileInfo>>();
 
             switch (request.Source)
@@ -106,8 +100,7 @@
             var stopwatch = Stopwatch.StartNew();
             foreach (var (source, target) in fileMap)
             {
-                var bytes = await File.ReadAllBytesAsync(source.FullName, cancellationToken);
-                var encrypted = aes.EncryptString(bytes, password);
+                var encrypted = await Kryptera.InternalEncryptFileAsync(source, request.Key, cancellationToken);
 
                 if (!encrypted.Success)
                 {

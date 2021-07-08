@@ -23,15 +23,21 @@ internal partial class ThisAssembly
     ///     Simple release-like version number, like 4.0.1 for a cycle 5, SR1 build.
     /// </summary>
     public const string SimpleVersion =
-        Git.BaseVersion.Major + "." + Git.BaseVersion.Minor + "." + Git.BaseVersion.Patch;
+        Git.SemVer.Major + "." + Git.SemVer.Minor + "." + Git.SemVer.Patch;
 
     /// <summary>
     ///     Full version, including commits since base version file, like 4.0.1.598
     /// </summary>
-    public const string Version = SimpleVersion + "." + Git.Commits;
+    public const string Version = SimpleVersion;
 
     /// <summary>
     ///     Full version, plus branch and commit short sha, like 4.0.1.598-cycle6+39cf84e
     /// </summary>
+#if ALPHA_BUILD
+    public const string InformationalVersion = Version + "-alpha" + "+" + Git.Commit;
+
+#else
     public const string InformationalVersion = Version + "+" + Git.Commit;
+
+#endif
 }

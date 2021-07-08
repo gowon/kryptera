@@ -5,11 +5,35 @@
     <LangVersion>latest</LangVersion>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <GitInfoReportImportance Condition="'$(Configuration)' == 'Release'">high</GitInfoReportImportance>
+  </PropertyGroup>
+
+  <PropertyGroup Label="NuspecProperties">
+    <Authors>Gowon Patterson</Authors>
+    <Description>Kryptera is a .NET Core Tool to quickly encrypt and decrypt files using AEAD AES-256-GCM, as well as an encryption key generator.</Description>
+    <Copyright>© Gowon Patterson. All rights reserved.</Copyright>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/gowon/kryptera</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTags>dotnet encrypt decrypt generator</PackageTags>
+    <PackageProjectUrl>https://github.com/gowon/kryptera</PackageProjectUrl>
+  </PropertyGroup>
+
+  <PropertyGroup Label="SourceLink">
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Include="..\GlobalAssemblyInfo.cs" Link="Properties\GlobalAssemblyInfo.cs" />
+  </ItemGroup>
+
+  <ItemGroup Label="SourceLink">
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,13 +47,15 @@
   <Target Name="SetVersion" BeforeTargets="Build;GetPackageVersion;_IntrospectProjectProperties" DependsOnTargets="GitVersion">
     <PropertyGroup>
       <!-- Packages for feature branches are marked as "alpha" (ex., 2.1.0-alpha426e8bcf) -->
-      <GitSemVerDashLabel Condition="$(GitBranch.Contains('feature'))">alpha+$(GitCommit)</GitSemVerDashLabel>
+      <GitSemVerDashLabel Condition="$(GitBranch.Contains('feature'))">alpha.$(GitCommit)</GitSemVerDashLabel>
 
       <!-- Packages for release branches are marked as "rc", release candidates (ex., 2.1.0-rc426e8bcf) -->
-      <GitSemVerDashLabel Condition="$(GitBranch.Contains('releases'))">rc+$(GitCommit)</GitSemVerDashLabel>
+      <GitSemVerDashLabel Condition="$(GitBranch.Contains('release'))">rc.$(GitCommit)</GitSemVerDashLabel>
 
       <!-- Packages for the master branch have no suffix (ex., 2.1.0) -->
       <GitSemVerDashLabel Condition="$(GitBranch.Contains('master'))"></GitSemVerDashLabel>
+
+      <DefineConstants Condition="$(GitBranch.Contains('feature'))">ALPHA_BUILD;$(DefineConstants)</DefineConstants>
 
       <PackageVersion Condition="'$(GitSemVerDashLabel)' != ''">$(GitSemVerMajor).$(GitSemVerMinor).$(GitSemVerPatch)-$(GitSemVerDashLabel)</PackageVersion>
       <PackageVersion Condition="'$(GitSemVerDashLabel)' == ''">$(GitSemVerMajor).$(GitSemVerMinor).$(GitSemVerPatch)</PackageVersion>
