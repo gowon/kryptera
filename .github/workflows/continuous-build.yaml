@@ -26,7 +26,6 @@ jobs:
     - name: Setup NuGet
       uses: nuget/setup-nuget@v1
       with:
-        nuget-api-key: ${{ secrets.FEEDZ_API_KEY }}
         nuget-version: 'latest'
 
     - name: Build solution
@@ -44,4 +43,6 @@ jobs:
         reporter: dotnet-trx    # Format of test results
 
     - name: Nuget Push
-      run: nuget push ${{ env.GITHUB_WORKSPACE }}/**/*.nupkg -Source https://f.feedz.io/gowon/pre-release/nuget/index.json -SkipDuplicate
+      env:
+          APIKEY: ${{ secrets.FEEDZ_API_KEY }}
+      run: nuget push ${{ env.GITHUB_WORKSPACE }}/**/*.nupkg -Source https://f.feedz.io/gowon/pre-release/nuget/index.json -ApiKey ::add-mask::$APIKEY -SkipDuplicate
