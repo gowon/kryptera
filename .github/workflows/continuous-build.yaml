@@ -44,4 +44,4 @@ jobs:
         reporter: dotnet-trx    # Format of test results
 
     - name: Nuget Push
-      run: nuget push -source https://f.feedz.io/gowon/pre-release/nuget/index.json *.nupkg
+      run: nuget push ${{ env.GITHUB_WORKSPACE }}/**/*.nupkg -Source https://f.feedz.io/gowon/pre-release/nuget/index.json -SkipDuplicate
