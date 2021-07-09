@@ -23,6 +23,12 @@ jobs:
       with:
         dotnet-version: '5.0.x'
 
+    - name: Setup NuGet
+      uses: nuget/setup-nuget@v1
+      with:
+        nuget-api-key: ${{ secrets.FEEDZ_API_KEY }}
+        nuget-version: 'latest'
+
     - name: Build solution
       run: dotnet build --configuration Release
       
@@ -36,3 +42,6 @@ jobs:
         name: Test Results
         path: test-results/*.trx    # Path to test results
         reporter: dotnet-trx    # Format of test results
+
+    - name: Nuget Push
+      run: nuget.exe push -source https://f.feedz.io/gowon/pre-release/nuget/index.json *.nupkg
