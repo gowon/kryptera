@@ -35,7 +35,7 @@ jobs:
       run: dotnet build --configuration Release
       
     - name: Test solution
-      run: dotnet test --logger "trx;LogFileName=test-results.trx" --collect "XPlat Code Coverage" --results-directory "./test-results"
+      run: dotnet test --configuration Release --no-build --logger "trx;LogFileName=test-results.trx" --collect "XPlat Code Coverage" --results-directory "./test-results"
 
     - name: Generate test report
       uses: dorny/test-reporter@v1
@@ -45,5 +45,11 @@ jobs:
         path: test-results/*.trx    # Path to test results
         reporter: dotnet-trx    # Format of test results
 
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        file: ./test-results/*.xml
+
     - name: Nuget Push
-      run: nuget push ${{ env.GITHUB_WORKSPACE }}/**/*.nupkg -Source https://f.feedz.io/gowon/pre-release/nuget/index.json -ApiKey ${{ secrets.FEEDZ_API_KEY }} -SkipDuplicate
+      run: nuget push */bin/Release/*.nupkg -Source https://f.feedz.io/gowon/pre-release/nuget/index.json -ApiKey ${{ secrets.FEEDZ_API_KEY }} -SkipDuplicate
