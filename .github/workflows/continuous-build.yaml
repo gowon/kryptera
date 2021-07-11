@@ -52,4 +52,4 @@ jobs:
         file: ./test-results/*.xml
 
     - name: Nuget Push
-      run: nuget push */bin/Release/*.nupkg -Source https://f.feedz.io/gowon/pre-release/nuget/index.json -ApiKey ${{ secrets.FEEDZ_API_KEY }} -SkipDuplicate
+      run: nuget push ${{ env.GITHUB_WORKSPACE }}/**/*.nupkg -Source https://f.feedz.io/gowon/pre-release/nuget/index.json -ApiKey ${{ secrets.FEEDZ_API_KEY }} -SkipDuplicate
