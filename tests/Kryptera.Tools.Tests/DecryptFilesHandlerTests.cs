@@ -1,84 +1,103 @@
 ﻿namespace Kryptera.Tools.Tests
 {
     using System;
+    using System.Collections.Generic;
     using System.CommandLine.IO;
     using System.IO;
     using System.Linq;
-    using System.Text;
     using System.Threading.Tasks;
     using Commands;
     using CryptHash.Net.Util;
-    using Extensions;
-    using Helpers;
     using MediatR;
     using Microsoft.Extensions.Logging;
     using Moq;
-    using NeoSmart.StreamCompare;
     using Xunit;
+    using Xunit.Categories;
+    using static Helpers.Utilities;
 
-    public class DecryptFilesHandlerTests
+    [IntegrationTest]
+    public class DecryptFilesHandlerTests : IDisposable
     {
-        [Fact(Skip = "Need to refactor")]
-        public async Task EncryptDecryptRoundTrip()
+        private const string Key = "urT8KiJwZuGIkcArTCRLrsQqGWYh2M5iX5fPGgAK0WU=";
+        private readonly TestConsole _console;
+        private readonly Mock<ILogger<DecryptFilesHandler>> _loggerMock;
+        private readonly DirectoryInfo _targetDirectory;
+        private readonly DirectoryInfo _tempDirectory;
+
+        public DecryptFilesHandlerTests()
         {
-            var console = new TestConsole();
-            var loggerMock = new Mock<ILogger<EncryptFilesHandler>>();
-            var key = Convert.ToBase64String(CommonMethods.Generate256BitKey());
+            var testDirectory = new DirectoryInfo(Path.Combine(Environment.CurrentDirectory, @"TestSets\Encrypted"));
+            _tempDirectory = new DirectoryInfo(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()));
+            _targetDirectory = new DirectoryInfo(Path.Combine(_tempDirectory.FullName, "decrypted"));
+            _console = new TestConsole();
+            _loggerMock = new Mock<ILogger<DecryptFilesHandler>>();
 
-            var testDirectory = new DirectoryInfo(Path.Combine(Environment.CurrentDirectory, "Samples"));
-            var tempDirectory = new DirectoryInfo(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()));
-            var targetDirectory = new DirectoryInfo(Path.Combine(tempDirectory.FullName, "encrypted"));
-            testDirectory.CopyAllFilesTo(tempDirectory);
+            testDirectory.CopyAllFilesTo(_tempDirectory);
+        }
 
+        public void Dispose()
+        {
+            _tempDirectory.Delete(true);
+        }
+
+        public static IEnumerable<object[]> GetKeyFileData()
+        {
+            var files = new[] {"sample1.txt.aes", "sample2.txt.aes", "sample3.txt.aes"};
+            return files.Select(s => new object[] {s});
+        }
+
+        [IntegrationTest]
+        [Theory]
+        [MemberData(nameof(GetKeyFileData))]
+        public async Task GenerateDecryptedFile(string path)
+        {
+            // Arrange
             // https://github.com/jbogard/MediatR/issues/526#issue-645312126
-            IRequestHandler<EncryptFiles> handler = new EncryptFilesHandler(console, loggerMock.Object);
-            await handler.Handle(new EncryptFiles
-            {
-                Source = tempDirectory,
-                Target = targetDirectory,
-                Key = key,
-                EncryptToBase64 = true,
-                ForceOverwrite = true
-            }, default);
+            IRequestHandler<DecryptFiles> sut = new DecryptFilesHandler(_console, _loggerMock.Object);
+            var inputFile = new FileInfo(Path.Combine(_tempDirectory.FullName, path));
+            var decryptedFile = new FileInfo($"{inputFile.FullName[0..^4]}");
 
-            //Assert.NotNull(console.Out.ToString());
-
-            console = new TestConsole();
-            var loggerMock2 = new Mock<ILogger<DecryptFilesHandler>>();
-            targetDirectory.Refresh();
-            IRequestHandler<DecryptFiles> handler2 = new DecryptFilesHandler(console, loggerMock2.Object);
-            await handler2.Handle(new DecryptFiles
+            // Act
+            await sut.Handle(new DecryptFiles
             {
-                Source = targetDirectory,
+                Source = inputFile,
                 Target = null,
-                Key = key,
-                DecryptBase64 = true,
+                Key = Key,
+                DecryptBase64 = false,
                 ForceOverwrite = true
             }, default);
 
-            //Assert.NotNull(console.Out.ToString());
+            decryptedFile.Refresh();
 
-            var compare = new FileCompare();
-            foreach (var file in tempDirectory.GetFiles())
+            // Assert
+            Assert.True(decryptedFile.Exists, $"Could not find expected file '{decryptedFile.FullName}'.");
+            var content = await File.ReadAllTextAsync(decryptedFile.FullName);
+            Assert.NotEmpty(content);
+            //Assert.True(IsBase64String(content), "File content is not a Base64-encoded string.");
+        }
+
+        [IntegrationTest]
+        [Fact]
+        public async Task HandlerDecryptsDirectory()
+        {
+            // Arrange
+            // https://github.com/jbogard/MediatR/issues/526#issue-645312126
+            IRequestHandler<DecryptFiles> handler = new DecryptFilesHandler(_console, _loggerMock.Object);
+
+            // Act
+            await handler.Handle(new DecryptFiles
             {
-                var success =
-                    await compare.AreEqualAsync(file.FullName, Path.Combine(targetDirectory.FullName, file.Name));
-                Assert.True(success);
-            }
+                Source = _tempDirectory,
+                Target = _targetDirectory,
+                Key = Key,
+                DecryptBase64 = false,
+                ForceOverwrite = true
+            }, default);
 
-            targetDirectory.Refresh();
-            foreach (var file in targetDirectory.GetFiles().Where(info =>
-                info.Extension.Equals(Constants.EncryptedFileExtension, StringComparison.OrdinalIgnoreCase)))
-            {
-                var x = await Kryptera.DecryptBase64FileAsync(file, key);
-                var encWithoutBom = new UTF8Encoding(false);
-                var y = encWithoutBom.GetString(await Kryptera.DecryptBase64FileBytesAsync(file, key))
-                    .TrimStart('\uFEFF', '\u200B');
-                var success = x.Equals(y);
-            }
+            _targetDirectory.Refresh();
 
-
-            tempDirectory.Delete(true);
+            // Assert
+            Assert.NotEmpty(_targetDirectory.GetFiles());
         }
     }
 }

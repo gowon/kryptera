@@ -67,7 +67,8 @@
                     switch (request.Target)
                     {
                         case null:
-                            targetFile = new FileInfo(GenerateDecryptedFilename(sourceFile));
+                            targetFile = new FileInfo(Path.Combine(sourceFile.DirectoryName!,
+                                GenerateDecryptedFilename(sourceFile)));
                             break;
                         case DirectoryInfo directoryInfo:
                             targetFile = new FileInfo(Path.Combine(directoryInfo.FullName,
@@ -105,6 +106,7 @@
 
                 if (!target.Exists || request.ForceOverwrite)
                 {
+                    target.Directory!.Create();
                     await File.WriteAllBytesAsync(target.FullName, decrypted.DecryptedDataBytes, cancellationToken);
                     _console.Out.WriteLine(
                         $"Wrote {decrypted.DecryptedDataBytes.Length.ToString().Pastel(Color.DeepSkyBlue)} bytes to {target.FullName.Pastel(Color.DimGray)}.");
@@ -120,12 +122,12 @@
             _logger.LogInformation("Operation completed in {DurationMilliseconds}ms", stopwatch.ElapsedMilliseconds);
         }
 
-        private static string GenerateDecryptedFilename(FileSystemInfo fileInfo)
+        private static string GenerateDecryptedFilename(FileInfo source)
         {
-            var targetFilename = fileInfo.Name;
+            var targetFilename = source.Name;
             targetFilename = targetFilename.EndsWith(Constants.EncryptedFileExtension)
                 ? targetFilename.Remove(targetFilename.Length - Constants.EncryptedFileExtension.Length)
-                : $"{Path.GetFileNameWithoutExtension(fileInfo.Name)}{Constants.DecryptedFileSuffix}{Path.GetExtension(fileInfo.Name)}";
+                : $"{Path.GetFileNameWithoutExtension(source.Name)}{Constants.DecryptedFileSuffix}{Path.GetExtension(source.Name)}";
 
             return targetFilename;
         }
