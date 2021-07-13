@@ -26,7 +26,7 @@
 
         public DecryptFilesHandlerTests()
         {
-            var testDirectory = new DirectoryInfo(Path.Combine(Environment.CurrentDirectory, @"TestSets\Encrypted"));
+            var testDirectory = new DirectoryInfo(Path.Combine(Environment.CurrentDirectory, "TestSets", "Encrypted"));
             _tempDirectory = new DirectoryInfo(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()));
             _targetDirectory = new DirectoryInfo(Path.Combine(_tempDirectory.FullName, "decrypted"));
             _console = new TestConsole();
