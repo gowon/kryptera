@@ -1,7 +1,7 @@
 # Kryptera
 
-![Nuget](https://img.shields.io/nuget/dt/Kryptera?color=blue&label=Kryptera%20downloads)
-![Nuget](https://img.shields.io/nuget/dt/Kryptera.Tools?color=blue&label=Kryptera.Tools%20downloads)
+[![Nuget](https://img.shields.io/nuget/dt/Kryptera?color=blue&label=Kryptera%20downloads)](https://www.nuget.org/packages/Kryptera)
+[![Nuget](https://img.shields.io/nuget/dt/Kryptera.Tools?color=blue&label=Kryptera.Tools%20downloads)](https://www.nuget.org/packages/Kryptera.Tools)
 [![codecov](https://codecov.io/gh/gowon/kryptera/branch/main/graph/badge.svg?token=RJUNMU04ZE)](https://codecov.io/gh/gowon/kryptera)
 
 Kryptera is a .NET Core Tool to quickly encrypt and decrypt files using AEAD AES-256-GCM algorithm from [CryptHash.NET](https://github.com/alecgn/crypthash-net/), as well as an encryption key generator. Kryptera means "encrypt" in [Swedish](https://translate.google.com/?sl=sv&tl=en&text=kryptera&op=translate).
@@ -10,8 +10,8 @@ Kryptera is a .NET Core Tool to quickly encrypt and decrypt files using AEAD AES
 
 |Package|Stable|Preview|
 |-|-|-|
-|Kryptera|![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/Kryptera)|[![feedz.io](https://img.shields.io/badge/endpoint.svg?url=https%3A%2F%2Ff.feedz.io%2Fgowon%2Fpre-release%2Fshield%2FKryptera%2Flatest)](https://f.feedz.io/gowon/pre-release/packages/Kryptera/latest/download)|
-|Kryptera.Tools|![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/Kryptera.Tools)|[![feedz.io](https://img.shields.io/badge/endpoint.svg?url=https%3A%2F%2Ff.feedz.io%2Fgowon%2Fpre-release%2Fshield%2FKryptera.Tools%2Flatest)](https://f.feedz.io/gowon/pre-release/packages/Kryptera.Tools/latest/download)|
+|Kryptera|[![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/Kryptera)](https://www.nuget.org/packages/Kryptera)|[![feedz.io](https://img.shields.io/badge/endpoint.svg?url=https%3A%2F%2Ff.feedz.io%2Fgowon%2Fpre-release%2Fshield%2FKryptera%2Flatest)](https://f.feedz.io/gowon/pre-release/packages/Kryptera/latest/download)|
+|Kryptera.Tools|[![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/Kryptera.Tools)](https://www.nuget.org/packages/Kryptera.Tools)|[![feedz.io](https://img.shields.io/badge/endpoint.svg?url=https%3A%2F%2Ff.feedz.io%2Fgowon%2Fpre-release%2Fshield%2FKryptera.Tools%2Flatest)](https://f.feedz.io/gowon/pre-release/packages/Kryptera.Tools/latest/download)|
 
 The Kryptera library can be obtained by either locally cloning this git repository and building it or via NuGet/Feedz:
 
