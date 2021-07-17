@@ -70,7 +70,7 @@ The output is sent directly to the console, and can be piped directly as input i
 You can encrypt a file or directory using the following command:
 
 ```shell
-kryptera encrypt --key tRKvyxIcQA6jV0eUoH/LA1QFlDSNUQRfzDJqU9CSvzM= <SOURCE>
+kryptera encrypt --key <KEY> <SOURCE>
 ```
 
 The filenames for the encrypted files will have `.aes` appended to them to make them easy to distinguish from the original files.
@@ -80,7 +80,7 @@ The filenames for the encrypted files will have `.aes` appended to them to make 
 You can decrypt a file or directory using the following command:
 
 ```shell
-kryptera decrypt --key tRKvyxIcQA6jV0eUoH/LA1QFlDSNUQRfzDJqU9CSvzM= <SOURCE>
+kryptera decrypt --key <KEY> <SOURCE>
 ```
 
 If the encrypted files have `.aes` extensions, then the filenames for the decrypted files with have this extension removed. If the encrypted file extensions are not `.aes`, then the filenames of the decrypted files with have `-decrypted` appended to the name right before the extension.
