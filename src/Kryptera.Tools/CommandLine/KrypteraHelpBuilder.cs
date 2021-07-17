@@ -25,22 +25,30 @@
 
         public override void Write(ICommand command)
         {
-            var color = Color.FromArgb(0, 119, 102); // teal
-            var asciiArtStrings = new[]
-            {
-                "",
-                $"                                                                 {"@w".Pastel(color)}",
-                $"                                                                             {"\"".Pastel(color)}"
-            };
-
+            var color = Color.DodgerBlue;
             if (command.Name.Equals(KrypteraRootCommand.AssemblyName, StringComparison.OrdinalIgnoreCase))
             {
-                //foreach (var line in asciiArtStrings)
-                //{
-                //    System.Console.WriteLine(line);
-                //}
+                var asciiArtStrings = new[]
+                {
+                    "",
+                    $"  {"    ████    ".Pastel(color)}",
+                    $"  {"  ██    ██  ".Pastel(color)}",
+                    $"  {"████████████".Pastel(color)}",
+                    $"  {"██░░░░░░░░██".Pastel(color)}",
+                    $"  {"██░░████░░██".Pastel(color)} Kryptera Encryption Command-line Tools {AssemblyVersion.Value.Pastel(color)}",
+                    $"  {"██░░░░░░░░██".Pastel(color)}",
+                    $"  {"████████████".Pastel(color)}",
+                    ""
+                };
 
-                System.Console.WriteLine($"Kryptera {AssemblyVersion.Value.Pastel(Color.DarkOrange)}\n");
+                foreach (var line in asciiArtStrings)
+                {
+                    System.Console.WriteLine(line);
+                }
+            }
+            else
+            {
+                System.Console.WriteLine($"Kryptera Encryption Command-line Tools {AssemblyVersion.Value.Pastel(color)}\n");
             }
 
             base.Write(command);

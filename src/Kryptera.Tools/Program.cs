@@ -70,7 +70,7 @@
                     config ??= new ConfigurationBuilder();
 
                     config
-                        //.SetBasePath(basePath)
+                        .SetBasePath(basePath)
                         .AddJsonFile("kryptera.json", true, false)
                         .AddEnvironmentVariables()
                         .AddCommandLine(args);

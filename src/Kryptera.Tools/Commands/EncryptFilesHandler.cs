@@ -2,49 +2,94 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.CommandLine;
+    using System.CommandLine.IO;
     using System.Diagnostics;
     using System.Drawing;
     using System.IO;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using CryptHash.Net.Encryption.AES.AEAD;
+    using Extensions;
     using MediatR;
     using Microsoft.Extensions.Logging;
     using Pastel;
 
     public class EncryptFilesHandler : AsyncRequestHandler<EncryptFiles>
     {
+        private readonly IConsole _console;
         private readonly ILogger<EncryptFilesHandler> _logger;
 
-        public EncryptFilesHandler(ILogger<EncryptFilesHandler> logger)
+        public EncryptFilesHandler(IConsole console, ILogger<EncryptFilesHandler> logger)
         {
-            _logger = logger;
+            _console = console ?? throw new NullReferenceException(nameof(console));
+            _logger = logger ?? throw new NullReferenceException(nameof(logger));
         }
 
         protected override async Task Handle(EncryptFiles request, CancellationToken cancellationToken)
         {
-            var stopwatch = Stopwatch.StartNew();
-            var aes = new AEAD_AES_256_GCM();
+            if (string.IsNullOrWhiteSpace(request.Key))
+            {
+                throw new ArgumentException("Key must not be empty", nameof(request.Key));
+            }
 
-            var files = new List<FileInfo>();
+            var fileMap = new List<Tuple<FileInfo, FileInfo>>();
+
             switch (request.Source)
             {
-                case DirectoryInfo directoryInfo:
-                    if (request.Target is not DirectoryInfo)
+                case DirectoryInfo sourceDirectory:
+                    DirectoryInfo targetDirectory;
+                    switch (request.Target)
                     {
-                        throw new InvalidOperationException("Target must be a directory if Source is a directory.");
+                        case null:
+                            targetDirectory = sourceDirectory;
+                            break;
+                        case DirectoryInfo directoryInfo:
+                            targetDirectory = directoryInfo;
+                            break;
+                        default:
+                            throw new InvalidOperationException(
+                                "Target must be a directory when Source is a directory.");
                     }
 
-                    if (directoryInfo.Exists)
+                    if (!targetDirectory.Exists)
                     {
-                        files.AddRange(directoryInfo.GetFiles());
+                        targetDirectory.Create();
+                    }
+
+                    if (sourceDirectory.Exists)
+                    {
+                        fileMap.AddRange(sourceDirectory.GetFiles()
+                            .Where(info => !info.Extension.Equals(Constants.EncryptedFileExtension,
+                                StringComparison.OrdinalIgnoreCase))
+                            .Select(file => new Tuple<FileInfo, FileInfo>(file,
+                                new FileInfo(Path.Combine(targetDirectory.FullName,
+                                    $"{file.Name}{Constants.EncryptedFileExtension}")))));
                     }
 
                     break;
-                case FileInfo fileInfo:
-                    if (fileInfo.Exists)
+                case FileInfo sourceFile:
+                    FileInfo targetFile;
+
+                    switch (request.Target)
                     {
-                        files.Add(fileInfo);
+                        case null:
+                            targetFile = new FileInfo($"{sourceFile.FullName}{Constants.EncryptedFileExtension}");
+                            break;
+                        case DirectoryInfo directoryInfo:
+                            targetFile = new FileInfo(Path.Combine(directoryInfo.FullName,
+                                $"{sourceFile.Name}{Constants.EncryptedFileExtension}"));
+                            break;
+                        case FileInfo fileInfo:
+                            targetFile = fileInfo;
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(request.Target));
+                    }
+
+                    if (sourceFile.Exists)
+                    {
+                        fileMap.Add(new Tuple<FileInfo, FileInfo>(sourceFile, targetFile));
                     }
 
                     break;
@@ -52,31 +97,40 @@
                     throw new ArgumentOutOfRangeException(nameof(request.Source));
             }
 
-            foreach (var file in files)
+            var stopwatch = Stopwatch.StartNew();
+            foreach (var (source, target) in fileMap)
             {
-                var bytes = await File.ReadAllBytesAsync(file.FullName, cancellationToken);
-                var password = Convert.FromBase64String(request.Key);
-                var result = aes.EncryptString(bytes, password);
+                var encrypted = await Kryptera.InternalEncryptFileAsync(source, request.Key, cancellationToken);
 
-                if (!result.Success)
+                if (!encrypted.Success)
                 {
+                    _logger.LogWarning($"Unable to encrypt {source.FullName.Pastel(Color.DimGray)}.");
                     continue;
                 }
 
-                if (request.ConsoleOutputOnly)
+                if (!target.Exists || request.ForceOverwrite)
                 {
-                    Console.WriteLine(result.EncryptedDataBase64String);
-                }
-
-                if (request.Target == null)
-                {
-                    var target = new FileInfo($"{file.FullName}.aes");
-                    if (!target.Exists || request.ForceOverwrite)
+                    if (request.EncryptToBase64)
                     {
-                        await File.WriteAllTextAsync(target.FullName, result.EncryptedDataBase64String, cancellationToken);
-                        Console.WriteLine(
-                            $"Wrote {result.EncryptedDataBytes.Length.ToString().Pastel(Color.DeepSkyBlue)} bytes to {target.FullName.Pastel(Color.DimGray)}.");
+                        await File.WriteAllTextAsync(target.FullName, encrypted.EncryptedDataBase64String,
+                            cancellationToken);
                     }
+                    else
+                    {
+                        await File.WriteAllBytesAsync(target.FullName, encrypted.EncryptedDataBytes, cancellationToken);
+                    }
+
+                    var length = request.EncryptToBase64
+                        ? encrypted.EncryptedDataBase64String.Length
+                        : encrypted.EncryptedDataBytes.Length;
+
+                    _console.Out.WriteLine(
+                        $"Wrote {length.ToString().Pastel(Color.DeepSkyBlue)} bytes to {target.FullName.Pastel(Color.DimGray)}.");
+                }
+                else
+                {
+                    _logger.LogWarning(
+                        $"File {target.FullName.Pastel(Color.DimGray)} already exists. To overwrite, please set the --force option.");
                 }
             }
 
